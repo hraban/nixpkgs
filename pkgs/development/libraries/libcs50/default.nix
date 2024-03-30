@@ -19,7 +19,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   installPhase = ''
     runHook preInstall
-    make install DESTDIR="$out"
+    mkdir -p $out
+    cp -R build/lib $out/
   '' + lib.optionalString stdenv.isLinux ''
     ln -sf $out/lib/libcs50.so.11.0.2 $out/lib/libcs50.so.11
   '' + ''

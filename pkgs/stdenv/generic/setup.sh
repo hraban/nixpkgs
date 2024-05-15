@@ -11,6 +11,9 @@ if [[ -n "${BASH_VERSINFO-}" && "${BASH_VERSINFO-}" -lt 4 ]]; then
 fi
 
 shopt -s inherit_errexit
+if __nixpkgs_setup_shopt_original_aliases="$(shopt -p expand_aliases)"; then
+    shopt -u expand_aliases
+fi
 
 if (( "${NIX_DEBUG:-0}" >= 6 )); then
     set -x
@@ -1629,6 +1632,7 @@ dumpVars
 
 
 # Restore the original options for nix-shell
+eval "$__nixpkgs_setup_shopt_original_aliases"
 [[ $__nixpkgs_setup_set_original == *e* ]] || set +e
 [[ $__nixpkgs_setup_set_original == *u* ]] || set +u
-unset -v __nixpkgs_setup_set_original
+unset -v __nixpkgs_setup_set_original __nixpkgs_setup_shopt_original_aliases

@@ -1,5 +1,4 @@
 { lib, stdenv, callPackage, ecl, coreutils, fetchurl, strace, texinfo, which, writeText, zstd
-, version
   # Set this to a lisp binary to use a custom bootstrap lisp compiler for SBCL.
   # Leave as null to use the default.  This is useful for local development of
   # SBCL, because you can use your existing stock SBCL as a boostrap.  On Hydra
@@ -9,14 +8,6 @@
 }:
 
 let
-  versionMap = {
-    "2.4.5" = {
-      sha256 = "sha256-TfaOkMkDGAdkK0t2GYjetb9qG9FSxHI0goNO+nNae9E=";
-    };
-    "2.4.6" = {
-      sha256 = "sha256-pImQeELa4JoXJtYphb96VmcKrqLz7KH7cCO8pnw/MJE=";
-    };
-  };
   # Collection of pre-built SBCL binaries for platforms that need them for
   # bootstrapping. Ideally these are to be avoided.  If ECL (or any other
   # non-binary-distributed Lisp) can run on any of these systems, that entry
@@ -56,15 +47,15 @@ let
 
 in
 
-stdenv.mkDerivation (self: {
+stdenv.mkDerivation (self: rec {
   pname = "sbcl";
-  inherit version;
+  version = "2.4.6";
 
   src = fetchurl {
     # Changing the version shouldn’t change the source for the
     # derivation. Override the src entirely if desired.
     url = "mirror://sourceforge/project/sbcl/sbcl/${version}/sbcl-${version}-source.tar.bz2";
-    inherit (versionMap.${version}) sha256;
+    sha256 = "sha256-pImQeELa4JoXJtYphb96VmcKrqLz7KH7cCO8pnw/MJE=";
   };
 
   nativeBuildInputs = [

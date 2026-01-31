@@ -19,7 +19,6 @@
   dbus,
   emacsPackagesFor,
   fetchpatch,
-  fetchFromGitHub,
   gettext,
   giflib,
   glib-networking,
@@ -74,8 +73,6 @@
   withCairo ? withX,
   withCsrc ? true,
   withDbus ? stdenv.hostPlatform.isLinux,
-  # https://github.com/d12frosted/homebrew-emacs-plus
-  withEmacsPlus ? false,
   # https://github.com/emacs-mirror/emacs/blob/emacs-30.2/etc/NEWS#L52-L56
   withGcMarkTrace ? false,
   withGTK3 ? withPgtk && !noGui,
@@ -128,7 +125,6 @@ assert (withGTK3 && !withNS && variant != "macport") -> withX || withPgtk;
 assert noGui -> !(withX || withGTK3 || withNS || variant == "macport");
 assert withAcl -> stdenv.hostPlatform.isLinux;
 assert withAlsaLib -> stdenv.hostPlatform.isLinux;
-assert withEmacsPlus -> (stdenv.hostPlatform.isDarwin && variant != "macport");
 assert withGpm -> stdenv.hostPlatform.isLinux;
 assert withImageMagick -> (withX || withNS);
 assert withNS -> stdenv.hostPlatform.isDarwin && !(withX || variant == "macport");
@@ -144,12 +140,6 @@ let
   ++ lib.optionals (stdenv.cc ? cc.lib.libgcc) [
     "${lib.getLib stdenv.cc.cc.lib.libgcc}/lib"
   ];
-  emacsPlus = fetchFromGitHub {
-    owner = "d12frosted";
-    repo = "homebrew-emacs-plus";
-    rev = "ffd7b5d2be09476a5c790ae2723de3a3e049401a";
-    hash = "sha256-82jRHHGCD0GLCBrvo1R3F5MEfA+G4ia9gMn4dy8h1Ec=";
-  };
 
   withWebkitgtk = withXwidgets && stdenv.hostPlatform.isLinux;
 in
@@ -171,16 +161,6 @@ stdenv.mkDerivation (finalAttrs: {
   inherit version;
 
   inherit src;
-
-  prePatch =
-    let
-      emacsPlusPatches = "${emacsPlus}/patches/emacs-${lib.versions.major finalAttrs.version}";
-    in
-    lib.optionalString withEmacsPlus ''
-      for f in ${emacsPlusPatches}/*; do
-        appendToVar patches "$f"
-      done
-    '';
 
   patches =
     patches fetchpatch
